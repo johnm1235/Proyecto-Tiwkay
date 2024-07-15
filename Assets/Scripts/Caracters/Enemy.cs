@@ -35,10 +35,25 @@ public class Enemy : MonoBehaviour
     private float stunTimer;
 
     //Variable para saber si el enemigo está persiguiendo al jugador
-    private bool isChasingPlayer = false; 
+    private bool isChasingPlayer = false;
+
+    public AudioClip walkSound;
+    public AudioClip runSound;
+    public AudioClip roarSound;
+
+    public AudioSource audioSource;
+
 
     private void Start()
     {
+        audioSource.spatialBlend = 1.0f; 
+
+        audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        audioSource.minDistance = 1f; 
+        audioSource.maxDistance = MaxVisionDistance; 
+
+        audioSource.loop = true;
+
         anim = GetComponent<Animator>();
         agente = GetComponent<NavMeshAgent>();
         MoveToNextWaypoint();
@@ -51,6 +66,7 @@ public class Enemy : MonoBehaviour
             sensor.onPlayerLost.AddListener(OnPlayerLost);
         }
     }
+
 
     private void Update()
     {
@@ -65,7 +81,7 @@ public class Enemy : MonoBehaviour
         {
             if (isStunned)
             {
-                StunBehavior();
+                StunTime();
             }
             else
             {
@@ -122,6 +138,13 @@ public class Enemy : MonoBehaviour
     private void PerseguirJugador()
     {
         isChasingPlayer = true;
+        if (!audioSource.isPlaying || audioSource.clip != runSound)
+        {
+            audioSource.clip = runSound;
+            audioSource.Play();
+        }
+
+        isChasingPlayer = true;
         agente.SetDestination(target.transform.position);
         float distanciaJugador = Vector3.Distance(transform.position, target.transform.position);
         if (distanciaJugador > agente.stoppingDistance)
@@ -135,6 +158,7 @@ public class Enemy : MonoBehaviour
         {
             agente.isStopped = true;
             anim.SetBool("run", false);
+            audioSource.loop = false;
             AtaqueIniciado();
         }
     }
@@ -142,11 +166,35 @@ public class Enemy : MonoBehaviour
     private void ControlarAnimaciones()
     {
         float speed = agente.velocity.magnitude;
-        anim.SetBool("walk", speed >= 1f);
+        bool isWalking = speed >= 1f;
+        anim.SetBool("walk", isWalking);
+
+        // Reproducir sonido de pasos o correr
+        if (isWalking && !audioSource.isPlaying)
+        {
+            audioSource.clip = walkSound;
+            audioSource.Play();
+        }
+        else if (!isWalking && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
     }
 
     private void AtaqueIniciado()
     {
+        // Verificar si el sonido de rugido ya se está reproduciendo
+        if (!(audioSource.isPlaying && audioSource.clip == roarSound))
+        {
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+            audioSource.clip = roarSound;
+            audioSource.loop = false; // Asegurar que no se reproduzca en bucle
+            audioSource.Play();
+        }
+
         atacando = true;
         anim.SetBool("attack", true);
         anim.SetBool("run", false);
@@ -154,6 +202,8 @@ public class Enemy : MonoBehaviour
 
         target.GetComponent<PlayerMovement>().AtacadoPorEnemigo();
     }
+
+
 
 
     public void OnPlayerDetected()
@@ -208,7 +258,7 @@ public class Enemy : MonoBehaviour
         waypointIndex = (waypointIndex + 1) % waypoints.Length;
     }
 
-    private void StunBehavior()
+    private void StunTime()
     {
         stunTimer -= Time.deltaTime;
         if (stunTimer <= 0)
