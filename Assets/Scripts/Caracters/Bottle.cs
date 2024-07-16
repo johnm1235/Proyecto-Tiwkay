@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bottle : MonoBehaviour
 {
     public Enemy enemy;
-
+    public float gravity = 9.8f;
 
     void OnCollisionEnter(Collision collision)
     {
@@ -27,5 +27,23 @@ public class Bottle : MonoBehaviour
     {
         this.enemy = enemy;
     }
+
+    //Duplicar el gravedad de la botella
+    public void SetGravity(float gravity)
+    {
+        this.gravity = gravity;
+    }
+
+    void Update()
+    {
+        transform.position += Vector3.down * gravity * Time.deltaTime;
+    }
+
+
+
+
+
+
+
 
 }
