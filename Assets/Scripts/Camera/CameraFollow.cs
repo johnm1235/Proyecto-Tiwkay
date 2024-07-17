@@ -2,16 +2,19 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform player; 
-    public float sensitivity = 2f;  
-    public float smoothing = 10f;  
-    public float maxVerticalAngle = 80f; 
+    public Transform player;
+    public float sensitivity = 2f;
+    public float smoothing = 10f;
+    public float maxVerticalAngle = 80f;
+    public float standingHeight = 1.5f;  // Altura de la cámara cuando está de pie
+    public float crouchingHeight = 0.75f; // Altura de la cámara cuando está agachado
+    public KeyCode crouchKey = KeyCode.C; // Tecla para agacharse
 
     private Vector3 offset;  // Distancia inicial entre la cámara y el jugador
+    private bool isCrouching = false; // Estado actual de si está agachado o no
 
     void Start()
     {
-
         offset = transform.position - player.position;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -26,6 +29,19 @@ public class CameraFollow : MonoBehaviour
         // Aplicar suavizado al movimiento de la cámara
         transform.position = Vector3.Lerp(transform.position, moveCamTo, smoothing * Time.deltaTime);
 
+        // Cambiar altura según el estado de agacharse
+        float targetHeight = isCrouching ? crouchingHeight : standingHeight;
+
+        // Interpolar la altura de la cámara
+        Vector3 newPosition = transform.position;
+        newPosition.y = Mathf.Lerp(transform.position.y, player.position.y + targetHeight, smoothing * Time.deltaTime);
+        transform.position = newPosition;
+
+        // Control de agacharse con tecla C
+        if (Input.GetKeyDown(crouchKey))
+        {
+            isCrouching = !isCrouching;
+        }
 
         float mouseX = Input.GetAxis("Mouse X") * sensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
@@ -43,5 +59,7 @@ public class CameraFollow : MonoBehaviour
         transform.RotateAround(player.position, transform.right, -mouseY);
     }
 }
+
+
 
 
