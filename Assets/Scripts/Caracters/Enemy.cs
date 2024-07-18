@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEditor;
-using UnityEngine.SceneManagement;
+
 
 public class Enemy : MonoBehaviour
 {
@@ -70,9 +68,8 @@ public class Enemy : MonoBehaviour
 
     private void Update()
     {
-        if (atacando)
+        if (atacando && !isAttackingCoroutineRunning)
         {
-            
             StartCoroutine(AtaqueYReinicio());
             atacando = false;
         }
@@ -95,11 +92,20 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private bool isAttackingCoroutineRunning = false;
+
     IEnumerator AtaqueYReinicio()
     {
+        if (isAttackingCoroutineRunning)
+            yield break;  // Salir si la corrutina ya está en ejecución
+
+        isAttackingCoroutineRunning = true;
         yield return new WaitForSeconds(1);
         GameManager.instance.PlayerLose();
+
+        isAttackingCoroutineRunning = false;
     }
+
 
     private void ComportamientoEnemigo()
     {
@@ -158,7 +164,11 @@ public class Enemy : MonoBehaviour
         {
             agente.isStopped = true;
             anim.SetBool("run", false);
-            audioSource.loop = false;
+            //audioSource.loop = false;
+
+
+
+
             AtaqueIniciado();
         }
     }
@@ -183,25 +193,20 @@ public class Enemy : MonoBehaviour
 
     private void AtaqueIniciado()
     {
-        // Verificar si el sonido de rugido ya se está reproduciendo
-        if (!(audioSource.isPlaying && audioSource.clip == roarSound))
+        atacando = true;
+        // Solo reproducir sonido de rugido si no está actualmente reproduciéndose
+        if (!audioSource.isPlaying || audioSource.clip != roarSound)
         {
-            if (audioSource.isPlaying)
-            {
-                audioSource.Stop();
-            }
             audioSource.clip = roarSound;
-            audioSource.loop = false; // Asegurar que no se reproduzca en bucle
             audioSource.Play();
         }
-
-        atacando = true;
         anim.SetBool("attack", true);
         anim.SetBool("run", false);
         anim.SetBool("walk", false);
 
         target.GetComponent<PlayerMovement>().AtacadoPorEnemigo();
     }
+
 
 
 
