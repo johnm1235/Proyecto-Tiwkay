@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+using System;
 public enum ItemType
 {
     keys,
@@ -13,11 +13,19 @@ public class PlayerInventory : MonoBehaviour
 {
     public static PlayerInventory Instance;
     public Item[] items;
+    public event Action OnInventoryChanged;
+
 
     private void Awake()
     {
         Instance = this;
     }
+
+    public void Update()
+    {
+        OnInventoryChanged?.Invoke();
+    }
+
 
     [System.Serializable]
     public class Item
@@ -64,7 +72,12 @@ public class PlayerInventory : MonoBehaviour
                 items[i].IsFull = itemDataList[i].isFull;
                 items[i].type = itemDataList[i].type;
                 items[i].amount = itemDataList[i].amount;
+                
             }
         }
     }
+
+
+
+
 }
