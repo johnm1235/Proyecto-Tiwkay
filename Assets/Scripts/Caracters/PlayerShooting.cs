@@ -2,27 +2,52 @@ using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
 {
-    public GameObject[] prefabBala;  
+    public GameObject[] prefabBala;
 
-    public float velocidadBala = 30f; 
-    public int maxDisparos = 3;  
-    public float tiempoEspera = 2f; 
+    public float velocidadBala = 30f;
+    public int maxDisparos = 3;
+    public float tiempoEspera = 2f;
 
     private int disparosRestantes;
     private float tiempoUltimoDisparo;
+    private PlayerInventory inventory; // Referencia al inventario del jugador
 
     void Start()
     {
         disparosRestantes = maxDisparos;
-        tiempoUltimoDisparo = -tiempoEspera;  
+        tiempoUltimoDisparo = -tiempoEspera;
+
+        // Obtener referencia al inventario del jugador
+        inventory = PlayerInventory.Instance; // Asegúrate de que PlayerInventory.Instance esté configurado correctamente
     }
 
     void Update()
     {
+        // Verificar si el jugador puede disparar según el inventario
         if (Input.GetMouseButtonDown(0) && Time.time >= tiempoUltimoDisparo + tiempoEspera && disparosRestantes > 0)
         {
-            Disparar();
+            // Verificar si el jugador tiene al menos una botella para disparar
+            if (inventory != null && TieneBotellasDisponibles())
+            {
+                Disparar();
+            }
+            else
+            {
+                Debug.Log("No tienes suficientes botellas en el inventario para disparar.");
+            }
         }
+    }
+
+    bool TieneBotellasDisponibles()
+    {
+        foreach (PlayerInventory.Item item in inventory.items)
+        {
+            if (item.type == ItemType.bottles && item.amount > 0)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void Disparar()
@@ -34,15 +59,7 @@ public class PlayerShooting : MonoBehaviour
         {
             rb.velocity = direccionDisparo * velocidadBala;
 
-            Bottle bottleScript = bala.GetComponent<Bottle>();
-            if (bottleScript != null)
-            {
-                bottleScript.SetEnemyReference(FindObjectOfType<Enemy>());
-            }
-            else
-            {
-                Debug.LogError("El prefab de bala no tiene el componente Bottle.");
-            }
+            // No necesitamos buscar el script Bottle si no vamos a modificarlo
         }
         else
         {
@@ -58,6 +75,5 @@ public class PlayerShooting : MonoBehaviour
         }
     }
 }
-
 
 
