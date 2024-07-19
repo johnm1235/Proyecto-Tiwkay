@@ -2,45 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class cambioCamara : MonoBehaviour
+public class CambioCamara : MonoBehaviour
 {
-    public GameObject[] camaras;
+    public GameObject camaraPrincipal; // Solo una cámara ahora
     private bool cambioRealizado = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Inicialmente activamos la primera cámara y desactivamos la segunda
-        camaras[0].SetActive(true);
-        camaras[1].SetActive(false);
+        // Activar la cámara principal al inicio
+        if (camaraPrincipal != null)
+        {
+            camaraPrincipal.SetActive(true);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Puedes eliminar los controles de teclado si ya no necesitas cambiar de cámara
+        // De lo contrario, puedes usar un método similar para otras funcionalidades
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            ActivarCamara(0);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) && !cambioRealizado)
-        {
-            ActivarCamara(1);
-            StartCoroutine(DesactivarCamaraTrasDelay(1, 2f)); // Desactivar cámara 2 después de 5 segundos
+            ActivarCamara();
         }
     }
 
-    void ActivarCamara(int indice)
+    void ActivarCamara()
     {
-        for (int i = 0; i < camaras.Length; i++)
+        // Asegúrate de que solo la cámara principal esté activa
+        if (camaraPrincipal != null)
         {
-            camaras[i].SetActive(i == indice);
+            camaraPrincipal.SetActive(true);
         }
-    }
-
-    IEnumerator DesactivarCamaraTrasDelay(int indice, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        ActivarCamara(indice);
-        cambioRealizado = true; // Marcar que el cambio ya se realizó
     }
 }
+

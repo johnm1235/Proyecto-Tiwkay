@@ -9,6 +9,7 @@ public class MenuUI : MonoBehaviour
 {
     public void StartGame()
     {
+        DataManager.Instance.ClearPlayerData();
         SceneManager.LoadScene(1);
     }
     public void Options()

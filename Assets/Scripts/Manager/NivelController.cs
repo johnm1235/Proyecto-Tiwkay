@@ -6,15 +6,18 @@ public class NivelController : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        //Si el jugador esta en el nivel 2 y toca el trigger, vuelve al nivel 1
-        if (other.CompareTag("Player") && GameManager.instance.GetNivelActual() == 2)
+        if (other.CompareTag("Player"))
         {
-            GameManager.instance.VolverNivel();
-        }
-        //Sino si el jugador esta en el nivel 1 y toca el trigger, carga el nivel 2
-        else
-        {
-            GameManager.instance.CargarSiguienteNivel();
+            DataManager.Instance.SavePlayerData();
+            if (GameManager.instance.GetNivelActual() == 2)
+            {
+                GameManager.instance.VolverNivel();
+            }
+            else
+            {
+                GameManager.instance.CargarSiguienteNivel();
+            }
         }
     }
+
 }

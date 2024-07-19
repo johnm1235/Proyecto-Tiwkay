@@ -1,14 +1,7 @@
-using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
-[System.Serializable]
-public class PlayerData
-{
-    public string playerName;
-    public int highScore;
-    public string highScorePlayerName;
-
-}
+using System.IO;
 
 public class DataManager : MonoBehaviour
 {
@@ -21,7 +14,7 @@ public class DataManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            filePath = Application.persistentDataPath + "/playerData.json";
+            filePath = Path.Combine(Application.persistentDataPath, "playerData.json");
         }
         else
         {
@@ -29,26 +22,36 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public void SaveData(PlayerData data)
+    public void SavePlayerData()
     {
+        PlayerData data = new PlayerData();
+        data.inventory = PlayerInventory.Instance.GetInventoryData();
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(filePath, json);
-        Debug.Log("Datos guardados en: " + filePath);
     }
 
-    public PlayerData LoadData()
+    public void LoadPlayerData()
     {
         if (File.Exists(filePath))
         {
             string json = File.ReadAllText(filePath);
             PlayerData data = JsonUtility.FromJson<PlayerData>(json);
-            Debug.Log("Datos cargados desde: " + filePath);
-            return data;
-        }
-        else
-        {
-            Debug.LogWarning("Archivo no encontrado en: " + filePath);
-            return new PlayerData();
+            PlayerInventory.Instance.LoadInventoryData(data.inventory);
         }
     }
+
+    public void ClearPlayerData()
+    {
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+        }
+    }
+
+}
+
+[System.Serializable]
+public class PlayerData
+{
+    public List<PlayerInventory.ItemData> inventory;
 }

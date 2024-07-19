@@ -39,11 +39,4 @@ public class Bottle : MonoBehaviour
         transform.position += Vector3.down * gravity * Time.deltaTime;
     }
 
-
-
-
-
-
-
-
 }

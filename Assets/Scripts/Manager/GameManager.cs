@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            
         }
         else
         {
@@ -21,13 +22,14 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void PlayerLose()
+    private void Start()
     {
-        ReiniciarNivel();
+        DataManager.Instance.LoadPlayerData();
     }
 
     public void ReiniciarNivel()
     {
+        DataManager.Instance.ClearPlayerData();
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -46,6 +48,27 @@ public class GameManager : MonoBehaviour
     {
         return SceneManager.GetActiveScene().buildIndex;
     }
+
+    public void WinGame()
+    {
+        Debug.Log("Has ganado el juego");
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        DataManager.Instance.LoadPlayerData();
+    }
+
 }
 
 

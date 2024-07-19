@@ -4,41 +4,46 @@ using UnityEngine;
 
 public class Agacharse : MonoBehaviour
 {
-    public BoxCollider collider;
-    public float alturaInicial = 2f;  // Altura inicial del collider
-    public float alturaModificada = 1f;  // Altura modificada del collider
+    public CharacterController characterController;
+    public float alturaInicial = 2f;  // Altura inicial del CharacterController
+    public float alturaModificada = 1f;  // Altura modificada del CharacterController
+    private Vector3 centroInicial;  // Centro inicial del CharacterController
 
     void Start()
     {
-        // Obtener el BoxCollider del GameObject si no se asignó explícitamente
-        if (collider == null)
+        // Obtener el CharacterController del GameObject si no se asignó explícitamente
+        if (characterController == null)
         {
-            collider = GetComponent<BoxCollider>();
+            characterController = GetComponent<CharacterController>();
         }
 
-        // Asignar la altura inicial al BoxCollider
-        collider.size = new Vector3(collider.size.x, alturaInicial, collider.size.z);
+        // Asignar la altura inicial al CharacterController y guardar el centro inicial
+        characterController.height = alturaInicial;
+        centroInicial = characterController.center;
     }
 
     void Update()
     {
-        // Ejemplo: Cambiar la altura cuando se presione la tecla 'H' (puedes cambiar esto según tu necesidad)
+        // Cambiar la altura cuando se presione la tecla 'C'
         if (Input.GetKeyDown(KeyCode.C))
         {
-            ToggleColliderHeight();
+            ToggleControllerHeight();
         }
     }
 
-    // Función para cambiar entre la altura inicial y la altura modificada del collider
-    void ToggleColliderHeight()
+    // Función para cambiar entre la altura inicial y la altura modificada del CharacterController
+    void ToggleControllerHeight()
     {
-        if (collider.size.y == alturaInicial)
+        if (characterController.height == alturaInicial)
         {
-            collider.size = new Vector3(collider.size.x, alturaModificada, collider.size.z);
+            characterController.height = alturaModificada;
+            // Ajustar el centro para mantener el personaje centrado al agacharse
+            characterController.center = new Vector3(centroInicial.x, centroInicial.y / 2, centroInicial.z);
         }
         else
         {
-            collider.size = new Vector3(collider.size.x, alturaInicial, collider.size.z);
+            characterController.height = alturaInicial;
+            characterController.center = centroInicial;
         }
     }
 }

@@ -101,7 +101,8 @@ public class Enemy : MonoBehaviour
 
         isAttackingCoroutineRunning = true;
         yield return new WaitForSeconds(1);
-        GameManager.instance.PlayerLose();
+
+        GameManager.instance.ReiniciarNivel();
 
         isAttackingCoroutineRunning = false;
     }
@@ -206,10 +207,6 @@ public class Enemy : MonoBehaviour
 
         target.GetComponent<PlayerMovement>().AtacadoPorEnemigo();
     }
-
-
-
-
 
     public void OnPlayerDetected()
     {
