@@ -1,11 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class Bottle : MonoBehaviour
 {
    // public Enemy enemy;
     public float gravity = 9.8f;
+    public AudioSource brakeSource;
+    public AudioClip brakeSound;
+
+    public void Start()
+    {
+        brakeSource.spatialBlend = 1.0f;
+        brakeSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        brakeSource.minDistance = 1f;
+        brakeSource.maxDistance = 10f;
+        brakeSource.loop = false;
+        brakeSource.clip = brakeSound;
+    }
 
     void OnCollisionEnter(Collision collision)
     {
@@ -24,10 +37,11 @@ public class Bottle : MonoBehaviour
 
             enemy.DistractToPoint(transform.position);
         }
+        brakeSource.PlayOneShot(brakeSound);
         Destroy(gameObject);
     }
 
-    //Duplicar el gravedad de la botella
+    //Duplicar el gravedad de la botellas
     public void SetGravity(float gravity)
     {
         this.gravity = gravity;

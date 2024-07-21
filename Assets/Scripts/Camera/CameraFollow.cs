@@ -29,6 +29,9 @@ public class CameraFollow : MonoBehaviour
         // Aplicar suavizado al movimiento de la cámara
         transform.position = Vector3.Lerp(transform.position, moveCamTo, smoothing * Time.deltaTime);
 
+        // Actualizar el estado de agacharse basado en si la tecla LeftControl está siendo presionada
+        isCrouching = Input.GetKey(KeyCode.LeftControl); // Cambio aquí
+
         // Cambiar altura según el estado de agacharse
         float targetHeight = isCrouching ? crouchingHeight : standingHeight;
 
@@ -36,12 +39,6 @@ public class CameraFollow : MonoBehaviour
         Vector3 newPosition = transform.position;
         newPosition.y = Mathf.Lerp(transform.position.y, player.position.y + targetHeight, smoothing * Time.deltaTime);
         transform.position = newPosition;
-
-        // Control de agacharse con tecla C
-        if (Input.GetKeyDown(crouchKey))
-        {
-            isCrouching = !isCrouching;
-        }
 
         float mouseX = Input.GetAxis("Mouse X") * sensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
@@ -58,6 +55,7 @@ public class CameraFollow : MonoBehaviour
         transform.RotateAround(player.position, Vector3.up, mouseX);
         transform.RotateAround(player.position, transform.right, -mouseY);
     }
+
 }
 
 

@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-
 public class Enemy : MonoBehaviour
 {
     public Animator anim;
@@ -27,30 +26,39 @@ public class Enemy : MonoBehaviour
     public Transform[] waypoints;
     public int waypointIndex = 0;
 
-    //Variables para cuando el enemigo está aturdido
-    public float stunDuration = 2.0f; 
+    // Variables para cuando el enemigo está aturdido
+    public float stunDuration = 2.0f;
     private bool isStunned = false;
     private float stunTimer;
 
-    //Variable para saber si el enemigo está persiguiendo al jugador
+    // Variable para saber si el enemigo está persiguiendo al jugador
     private bool isChasingPlayer = false;
 
     public AudioClip walkSound;
     public AudioClip runSound;
     public AudioClip roarSound;
+    public AudioClip crySound;
 
     public AudioSource audioSource;
+    public AudioSource roarSource;
+    public AudioSource crySource;
 
+    public float minCryInterval = 5f;
+    public float maxCryInterval = 15f;
 
     private void Start()
     {
-        audioSource.spatialBlend = 1.0f; 
-
+        audioSource.spatialBlend = 1.0f;
         audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
-        audioSource.minDistance = 1f; 
-        audioSource.maxDistance = MaxVisionDistance; 
-
+        audioSource.minDistance = 1f;
+        audioSource.maxDistance = MaxVisionDistance;
         audioSource.loop = true;
+
+        crySource.spatialBlend = 1.0f;
+        crySource.rolloffMode = AudioRolloffMode.Logarithmic;
+        crySource.minDistance = 1f;
+        crySource.maxDistance = MaxVisionDistance;
+        crySource.playOnAwake = false;  // Asegurarse de que no se reproduce automáticamente
 
         anim = GetComponent<Animator>();
         agente = GetComponent<NavMeshAgent>();
@@ -63,8 +71,10 @@ public class Enemy : MonoBehaviour
             sensor.onPlayerDetected.AddListener(OnPlayerDetected);
             sensor.onPlayerLost.AddListener(OnPlayerLost);
         }
-    }
 
+        // Comenzar la reproducción aleatoria de sonidos de lloriqueo con demora inicial
+        StartCoroutine(PlayCrySoundRandomly());
+    }
 
     private void Update()
     {
@@ -73,7 +83,6 @@ public class Enemy : MonoBehaviour
             StartCoroutine(AtaqueYReinicio());
             atacando = false;
         }
-
         else
         {
             if (isStunned)
@@ -106,7 +115,6 @@ public class Enemy : MonoBehaviour
 
         isAttackingCoroutineRunning = false;
     }
-
 
     private void ComportamientoEnemigo()
     {
@@ -165,11 +173,6 @@ public class Enemy : MonoBehaviour
         {
             agente.isStopped = true;
             anim.SetBool("run", false);
-            //audioSource.loop = false;
-
-
-
-
             AtaqueIniciado();
         }
     }
@@ -196,10 +199,10 @@ public class Enemy : MonoBehaviour
     {
         atacando = true;
         // Solo reproducir sonido de rugido si no está actualmente reproduciéndose
-        if (!audioSource.isPlaying || audioSource.clip != roarSound)
+        if (!roarSource.isPlaying || roarSource.clip != roarSound)
         {
-            audioSource.clip = roarSound;
-            audioSource.Play();
+            roarSource.clip = roarSound;
+            roarSource.Play();
         }
         anim.SetBool("attack", true);
         anim.SetBool("run", false);
@@ -210,7 +213,6 @@ public class Enemy : MonoBehaviour
 
     public void OnPlayerDetected()
     {
-
         Debug.Log("Jugador detectado");
         jugadorDetectado = true;
         agente.speed = 12f;
@@ -228,7 +230,7 @@ public class Enemy : MonoBehaviour
         anim.SetBool("run", false);
         anim.SetBool("walk", false);
         anim.SetBool("attack", false);
-        isChasingPlayer = false; 
+        isChasingPlayer = false;
     }
 
     public void DistractToPoint(Vector3 point)
@@ -277,5 +279,27 @@ public class Enemy : MonoBehaviour
         stunTimer = stunDuration;
         anim.SetBool("stunned", true);
         agente.isStopped = true;
+
+        // Reproducir sonido de rugido cuando el enemigo está aturdido
+        if (!roarSource.isPlaying)
+        {
+            roarSource.clip = roarSound;
+            roarSource.Play();
+        }
+    }
+
+    IEnumerator PlayCrySoundRandomly()
+    {
+        while (true)
+        {
+            float waitTime = Random.Range(minCryInterval, maxCryInterval);
+            yield return new WaitForSeconds(waitTime);
+
+            if (!crySource.isPlaying) // Asegurarse de que no se esté reproduciendo ya el sonido
+            {
+                crySource.clip = crySound;
+                crySource.Play();
+            }
+        }
     }
 }

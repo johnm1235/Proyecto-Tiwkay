@@ -24,26 +24,29 @@ public class Agacharse : MonoBehaviour
 
     void Update()
     {
-        // Cambiar la altura cuando se presione la tecla 'C'
-        if (Input.GetKeyDown(KeyCode.C))
+        // Cambiar la altura mientras la tecla 'LeftControl' esté presionada
+        if (Input.GetKey(KeyCode.LeftControl))
         {
-            ToggleControllerHeight();
-        }
-    }
-
-    // Función para cambiar entre la altura inicial y la altura modificada del CharacterController
-    void ToggleControllerHeight()
-    {
-        if (characterController.height == alturaInicial)
-        {
-            characterController.height = alturaModificada;
-            // Ajustar el centro para mantener el personaje centrado al agacharse
-            characterController.center = new Vector3(centroInicial.x, centroInicial.y / 2, centroInicial.z);
+            Agachar();
         }
         else
         {
-            characterController.height = alturaInicial;
-            characterController.center = centroInicial;
+            Levantar();
         }
+    }
+
+    // Función para agachar el personaje
+    void Agachar()
+    {
+        characterController.height = alturaModificada;
+        // Ajustar el centro para mantener el personaje centrado al agacharse
+        characterController.center = new Vector3(centroInicial.x, centroInicial.y / 2, centroInicial.z);
+    }
+
+    // Función para levantar el personaje a su altura inicial
+    void Levantar()
+    {
+        characterController.height = alturaInicial;
+        characterController.center = centroInicial;
     }
 }
