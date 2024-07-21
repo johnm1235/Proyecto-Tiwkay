@@ -7,6 +7,7 @@ using UnityEditor;
 
 public class MenuUI : MonoBehaviour
 {
+    public GameObject menuConfig;
     public void StartGame()
     {
         DataManager.Instance.ClearPlayerData();
@@ -15,7 +16,7 @@ public class MenuUI : MonoBehaviour
     }
     public void Options()
     {
-
+        menuConfig.SetActive(true);
     }
     public void Exit()
     {
