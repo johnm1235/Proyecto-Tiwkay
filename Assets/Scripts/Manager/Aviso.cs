@@ -7,6 +7,25 @@ public class Aviso : MonoBehaviour
     public GameObject canvasWin;
     public bool seRequiereLlave = true;
 
+    public AudioClip campanaSound;
+
+    public AudioSource CampanaAudioSource;
+
+    public float minCamInterval = 5f;
+    public float maxCamInterval = 15f;
+
+    public void Start()
+    {
+        CampanaAudioSource.spatialBlend = 1.0f;
+        CampanaAudioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        CampanaAudioSource.minDistance = 1f;
+        CampanaAudioSource.maxDistance = 50f;
+        CampanaAudioSource.playOnAwake = false;  // Asegurarse de que no se reproduce automáticamente
+
+        StartCoroutine(PlayCampanaSoundRandomly());
+    }
+
+
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -65,5 +84,20 @@ public class Aviso : MonoBehaviour
 
         // Desactivar el canvas después de 3 segundos
         textoCanvas.SetActive(false);
+    }
+
+    IEnumerator PlayCampanaSoundRandomly()
+    {
+        while (true)
+        {
+            float waitTime = Random.Range(minCamInterval, maxCamInterval);
+            yield return new WaitForSeconds(waitTime);
+
+            if (!CampanaAudioSource.isPlaying) // Asegurarse de que no se esté reproduciendo ya el sonido
+            {
+                CampanaAudioSource.clip = campanaSound;
+                CampanaAudioSource.Play();
+            }
+        }
     }
 }
