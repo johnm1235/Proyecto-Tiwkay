@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+//using System.Diagnostics;
 using UnityEngine;
+
 
 public class Bottle : MonoBehaviour
 {
-   // public Enemy enemy;
+    // public Enemy enemy;
     public float gravity = 9.8f;
     public AudioSource brakeSource;
     public AudioClip brakeSound;
@@ -20,11 +21,24 @@ public class Bottle : MonoBehaviour
         brakeSource.clip = brakeSound;
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Groundetect") )
+        {
+            brakeSource.PlayOneShot(brakeSound);
+        }
+        if (other.gameObject.CompareTag("EnemyContact"))
+        {
+            brakeSource.PlayOneShot(brakeSound);
+        }
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         Enemy enemy = FindObjectOfType<Enemy>();
         if (collision.gameObject.CompareTag("Enemy"))
         {
+            brakeSource.PlayOneShot(brakeSound);
             Enemy hitEnemy = collision.gameObject.GetComponent<Enemy>();
             if (hitEnemy != null)
             {
@@ -34,10 +48,8 @@ public class Bottle : MonoBehaviour
          
         else if (enemy != null)
         {
-
             enemy.DistractToPoint(transform.position);
         }
-        brakeSource.PlayOneShot(brakeSound);
         Destroy(gameObject);
     }
 

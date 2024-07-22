@@ -46,6 +46,8 @@ public class Enemy : MonoBehaviour
     public float minCryInterval = 5f;
     public float maxCryInterval = 15f;
 
+    public GameObject canvasScreen;
+
     private void Start()
     {
         audioSource.spatialBlend = 1.0f;
@@ -63,6 +65,7 @@ public class Enemy : MonoBehaviour
         anim = GetComponent<Animator>();
         agente = GetComponent<NavMeshAgent>();
         MoveToNextWaypoint();
+        canvasScreen.SetActive(false);
 
         // Suscribirse a los eventos del AiSensor
         AiSensor sensor = GetComponent<AiSensor>();
@@ -109,7 +112,10 @@ public class Enemy : MonoBehaviour
             yield break;  // Salir si la corrutina ya está en ejecución
 
         isAttackingCoroutineRunning = true;
+        canvasScreen.SetActive(true);
         yield return new WaitForSeconds(1);
+
+       
 
         GameManager.instance.ReiniciarNivel();
 
