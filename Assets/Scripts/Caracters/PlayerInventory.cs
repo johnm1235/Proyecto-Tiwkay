@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using System;
+
 public enum ItemType
 {
     keys,
@@ -14,11 +14,13 @@ public class PlayerInventory : MonoBehaviour
     public static PlayerInventory Instance;
     public Item[] items;
     public event Action OnInventoryChanged;
-
+    private AudioSource audioSource;
+    public AudioClip recogerSound;
 
     private void Awake()
     {
         Instance = this;
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void Update()
@@ -26,6 +28,37 @@ public class PlayerInventory : MonoBehaviour
         OnInventoryChanged?.Invoke();
     }
 
+    public void AddItem(Item newItem)
+    {
+        // Lógica para agregar el item al inventario
+        // Aquí debes agregar la lógica de añadir el item, este es solo un ejemplo
+        foreach (Item item in items)
+        {
+            if (!item.IsFull)
+            {
+                item.name = newItem.name;
+                item.IsFull = true;
+                item.type = newItem.type;
+                item.amount = newItem.amount;
+                item.SlotSprite = newItem.SlotSprite;
+
+                // Reproduce el sonido cuando se agrega el objeto
+                if (recogerSound != null && audioSource != null)
+                {
+                    Debug.Log("Reproduciendo sonido de recogida.");
+                    audioSource.PlayOneShot(recogerSound);
+                }
+                else
+                {
+                    Debug.LogWarning("recogerSound o audioSource es nulo.");
+                }
+
+                // Notifica que el inventario ha cambiado
+                OnInventoryChanged?.Invoke();
+                break;
+            }
+        }
+    }
 
     [System.Serializable]
     public class Item
@@ -72,12 +105,7 @@ public class PlayerInventory : MonoBehaviour
                 items[i].IsFull = itemDataList[i].isFull;
                 items[i].type = itemDataList[i].type;
                 items[i].amount = itemDataList[i].amount;
-                
             }
         }
     }
-
-
-
-
 }

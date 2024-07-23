@@ -52,9 +52,9 @@ public class Aviso : MonoBehaviour
     {
         foreach (var item in PlayerInventory.Instance.items)
         {
-            if (item.type == ItemType.keys && item.amount > 0)
+            if (item.type == ItemType.keys && item.amount > 1)
             {
-                return true; // El jugador tiene al menos una llave
+                return true; // El jugador mas de una llave
             }
         }
         return false; // El jugador no tiene llaves
@@ -80,7 +80,7 @@ public class Aviso : MonoBehaviour
 
     IEnumerator EsperarYDesactivar()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(7f);
 
         // Desactivar el canvas después de 3 segundos
         textoCanvas.SetActive(false);
